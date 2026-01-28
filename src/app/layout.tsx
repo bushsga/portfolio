@@ -17,16 +17,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-       <head>
+    <html lang="en" className="scroll-smooth">
+      <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
-          <Navigation />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-        </div>
+        {/* Navigation is fixed, so it stays at top */}
+        <Navigation />
+        
+        {/* Main content starts below the fixed nav */}
+        <main className="min-h-screen bg-gray-950 text-gray-100">
+          {children}
+        </main>
+        
+        <Footer />
       </body>
     </html>
   );

@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <ProjectsGrid limit={4} />
+      <ProjectsGrid limit={6} /> {/* Show 6 projects on homepage */}
       <SkillsSection />
       <ExperienceSection />
       <ContactSection />

@@ -25,8 +25,8 @@ export default function Hero() {
         
         <p className="text-base sm:text-lg text-gray-400 mb-8 sm:mb-10 max-w-3xl leading-relaxed">
           With 3 years of experience building responsive, maintainable web applications. 
-          Currently working with Luxa Digital Solution and collaborating on the Refil gas delivery app 
-          (similar to Chowdeck's business strategy) and an Islamic Solah guide app.
+          Currently working with Luxa Digital Solution and collaborating on the Refil gas delivery app and an Islamic Solah guide app. A Frontend developer specializing in creating responsive web applications and service websites integrated with booking systems. 
+          I build modern solutions using React, Next.js, and connect them with tools like Calendly for client appointment scheduling.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
