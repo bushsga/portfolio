@@ -40,7 +40,7 @@ export default function Navigation() {
               className="flex items-center space-x-2 text-xl font-bold hover:scale-105 transition-transform"
             >
               <Code2 className="w-6 h-6 text-blue-400" />
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <span className=" from-blue-400">
                 Ibrahim.dev
               </span>
             </Link>

@@ -53,9 +53,9 @@ export default function ContactSection() {
     <section id="contact" className="responsive-container py-8 sm:py-12 md:py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-            Get In Touch
-          </h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-white">
+  Get In Touch
+</h2>
           <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto px-4">
             Looking for a dedicated frontend developer? Let&apos;s build something amazing together.
           </p>

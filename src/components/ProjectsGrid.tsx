@@ -11,9 +11,9 @@ export default function ProjectsGrid({ limit }: ProjectsGridProps) {
   return (
     <section id="projects" className="responsive-container py-8 sm:py-12 md:py-16">
       <div className="text-center mb-8 sm:mb-12">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-          {limit ? 'Featured Projects' : 'All Projects'}
-        </h2>
+       <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-white">
+  {limit ? 'Featured Projects' : 'All Projects'}
+</h2>
         <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto px-4">
           {limit 
             ? `Showing ${displayedProjects.length} of ${projects.length} real-world applications`

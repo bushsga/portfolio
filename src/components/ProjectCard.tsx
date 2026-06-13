@@ -1,14 +1,57 @@
 'use client';
 
-import { useState } from 'react';
-import { ExternalLink, Github, Star, Wrench, Lock, X, Calendar, Users, Code } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { ExternalLink, Github, Star, Wrench, Lock, X, Code } from 'lucide-react';
 import { ProjectCardProps } from '@/app/types';
 import Image from 'next/image';
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isModalOpenRef = useRef(false);
+  
+  // Keep a ref to currentImageIndex so interval always reads latest value
+  const currentImageIndexRef = useRef(0);
+
+  // Sync refs with state
+  useEffect(() => {
+    isModalOpenRef.current = isModalOpen;
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    currentImageIndexRef.current = currentImageIndex;
+  }, [currentImageIndex]);
+
+  // Auto-slide for cards with multiple images
+  useEffect(() => {
+    // Only set up interval if there are multiple images
+    if (project.images.length <= 1) return;
+
+    // Clear any existing interval first
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // Start new interval - use ref to get latest index
+    intervalRef.current = setInterval(() => {
+      if (!isModalOpenRef.current) {
+        const nextIndex = (currentImageIndexRef.current + 1) % project.images.length;
+        setCurrentImageIndex(nextIndex);
+      }
+    }, 3000);
+
+    // Cleanup on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [project.images.length]);
 
   const handleCardClick = () => {
+    setCurrentImageIndex(0);
     setIsModalOpen(true);
   };
 
@@ -16,22 +59,33 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     setIsModalOpen(false);
   };
 
+  const nextImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
+  }, [project.images.length]);
+
+  const prevImage = useCallback(() => {
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + project.images.length) % project.images.length
+    );
+  }, [project.images.length]);
+
   return (
     <>
-      {/* Clickable Project Card */}
-      <div 
+      {/* ---------- Card ---------- */}
+      <div
         onClick={handleCardClick}
         className="group bg-gray-900 rounded-xl border border-gray-800 hover:border-gray-700 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 cursor-pointer"
       >
         {/* Image Container */}
         <div className="relative h-48 w-full overflow-hidden bg-gray-800">
-          {project.image ? (
+          {project.images.length > 0 ? (
             <Image
-              src={project.image}
-              alt={`${project.title} screenshot`}
+              src={project.images[currentImageIndex]}
+              alt={`${project.title} screenshot ${currentImageIndex + 1}`}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover transition-opacity duration-500"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={currentImageIndex === 0}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -44,8 +98,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               </div>
             </div>
           )}
-          
-          {/* Badges Container */}
+
+          {/* Badges */}
           <div className="absolute top-3 left-3 right-3 flex justify-between">
             <div className="flex gap-2">
               {project.featured && (
@@ -54,14 +108,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   Featured
                 </div>
               )}
-              {project.title === 'Developer Portfolio' && (
-                <div className="flex items-center bg-green-500/20 backdrop-blur-sm border border-green-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-green-300">
-                  <span className="mr-1.5">🚀</span>
-                  This Site
-                </div>
-              )}
             </div>
-            
             {project.status === 'in-progress' && (
               <div className="flex items-center bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-yellow-300">
                 <Wrench className="w-3.5 h-3.5 mr-1.5" />
@@ -69,16 +116,37 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               </div>
             )}
           </div>
+
+          {/* Image dots (if multiple images) */}
+          {project.images.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-10">
+              {project.images.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === currentImageIndex
+                      ? 'bg-white scale-110'
+                      : 'bg-white/50 hover:bg-white/80'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(idx);
+                  }}
+                  aria-label={`View image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        
-        {/* Card Content */}
+
+        {/* Content */}
         <div className="p-6">
           <h3 className="text-xl font-bold text-white mb-3">{project.title}</h3>
           <p className="text-gray-400 mb-5 line-clamp-2">{project.description}</p>
           <div className="flex flex-wrap gap-2 mb-6">
-            {project.tags.map((tag: string, index: number) => (
+            {project.tags.map((tag, idx) => (
               <span
-                key={index}
+                key={idx}
                 className="px-3 py-1.5 bg-gray-800 text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-700 transition-colors cursor-default"
               >
                 {tag}
@@ -92,7 +160,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium transition-colors group/link text-sm sm:text-base"
-                onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+                onClick={(e) => e.stopPropagation()}
               >
                 Live Demo
                 <ExternalLink className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
@@ -109,8 +177,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
-                aria-label={`View ${project.title} source code`}
-                onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+                onClick={(e) => e.stopPropagation()}
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -123,14 +190,16 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
 
-      {/* Modal for Full Description */}
+      {/* ---------- Modal (unchanged) ---------- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div 
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={closeModal}
+        >
+          <div
             className="relative bg-gray-900 border border-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors z-10"
@@ -139,17 +208,43 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               <X className="w-6 h-6" />
             </button>
 
-            {/* Modal Content */}
             <div className="p-6 sm:p-8">
-              {/* Project Image */}
               <div className="relative h-48 sm:h-56 w-full rounded-xl overflow-hidden mb-6 bg-gray-800">
-                {project.image ? (
-                  <Image
-                    src={project.image}
-                    alt={`${project.title} screenshot`}
-                    fill
-                    className="object-cover"
-                  />
+                {project.images.length > 0 ? (
+                  <>
+                    <Image
+                      src={project.images[currentImageIndex]}
+                      alt={`${project.title} screenshot ${currentImageIndex + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                    {project.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors text-lg leading-none"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors text-lg leading-none"
+                        >
+                          ›
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5">
+                          {project.images.map((_, idx) => (
+                            <span
+                              key={idx}
+                              className={`w-2 h-2 rounded-full ${
+                                idx === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -161,7 +256,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 )}
               </div>
 
-              {/* Project Title & Status */}
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white flex-grow">
                   {project.title}
@@ -178,50 +272,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 )}
               </div>
 
-              {/* Full Description */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-white mb-3">Description</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  {project.description}
-                </p>
-                
-                {/* Additional details for specific projects */}
-                {project.title === 'Therapy Service Website' && (
-                  <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <h4 className="font-bold text-blue-300 mb-2 flex items-center">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Calendly Integration
-                    </h4>
-                    <p className="text-gray-300 text-sm">
-                      This website features seamless Calendly integration, allowing clients to book appointments directly, 
-                      choose available time slots, and receive automatic email confirmations.
-                    </p>
-                  </div>
-                )}
-                
-                {project.tags.includes('Team Collaboration') && (
-                  <div className="mt-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                    <h4 className="font-bold text-purple-300 mb-2 flex items-center">
-                      <Users className="w-4 h-4 mr-2" />
-                      Team Collaboration
-                    </h4>
-                    <p className="text-gray-300 text-sm">
-                      Developed as part of a team, with collaborative development and regular code reviews.
-                    </p>
-                  </div>
-                )}
+                <p className="text-gray-300 leading-relaxed">{project.description}</p>
               </div>
 
-              {/* Technologies */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-white mb-3 flex items-center">
                   <Code className="w-5 h-5 mr-2" />
                   Technologies Used
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag: string, index: number) => (
+                  {project.tags.map((tag, idx) => (
                     <span
-                      key={index}
+                      key={idx}
                       className="px-3 py-1.5 bg-gray-800 text-gray-300 rounded-lg text-sm font-medium"
                     >
                       {tag}
@@ -230,7 +294,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-800">
                 {project.liveUrl !== '#' && (
                   <a
@@ -256,7 +319,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 )}
                 {project.liveUrl === '#' && project.githubUrl === '#' && (
                   <div className="text-center text-gray-500 italic">
-                    Private project - details available upon request
+                    Private project – details available upon request
                   </div>
                 )}
               </div>

@@ -6,7 +6,7 @@ export interface Project {
   title: string;
   description: string;
   tags: string[];
-  image: string;
+  images: string[]; // changed from 'image' to 'images' array
   liveUrl: string;
   githubUrl: string;
   featured?: boolean;

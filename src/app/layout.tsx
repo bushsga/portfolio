@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Ibrahim Jamiu Akeem - Frontend Developer',
   description: 'Frontend Developer specializing in React, Next.js, and React Native with 3 years of experience',
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
 
 export default function RootLayout({

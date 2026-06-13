@@ -8,9 +8,9 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
-            <p className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Ibrahim Jamiu Akeem
-            </p>
+            <p className="text-2xl font-bold text-blue-400">
+  Ibrahim Jamiu Akeem
+</p>
             <p className="text-gray-400 mt-1">Frontend Developer & React Specialist</p>
           </div>
           <div className="flex space-x-8 mb-6 md:mb-0">
@@ -35,7 +35,7 @@ export default function Footer() {
           </div>
           <div className="text-center md:text-right">
             <p className="text-gray-400 text-sm flex items-center justify-center md:justify-end">
-              Made with <Heart className="w-4 h-4 mx-1 text-red-500 fill-current" /> 
+              Made  
               using Next.js & TypeScript
             </p>
             <p className="text-gray-500 text-sm mt-1">
