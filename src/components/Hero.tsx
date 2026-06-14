@@ -100,7 +100,7 @@ export default function Hero() {
           <span className="text-blue-400">React Native</span>
         </h2>
 
-        <p className="text-base sm:text-lg text-gray-400 mb-8 sm:mb-10 max-w-3xl leading-relaxed">
+        <p className="text-base sm:text-lg text-white mb-8 sm:mb-10 max-w-3xl leading-relaxed">
             With 3+ years of experience crafting high-performance web applications, I specialize in building 
   modern e-commerce platforms, business management tools, and interactive web experiences. 
   Currently working at Luxa Digital Solution as a Frontend Developer & Mentor while building 
